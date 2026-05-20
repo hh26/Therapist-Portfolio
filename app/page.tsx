@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Heart, Users, User, ArrowRight, Calendar, Phone, Mail, GraduationCap, Globe, Clock, Sparkles, Target, PieChart, HandHeart, Leaf, LifeBuoy, Book, Anchor, Moon, Download, MessageCircle, X, Send } from 'lucide-react';
 
 export default function TherapistPortfolio() {
@@ -49,11 +50,15 @@ export default function TherapistPortfolio() {
           </div>
         </div>
         <div className="flex-1 w-full relative">
-          {/* Image Placeholder */}
           <div className="aspect-square md:aspect-[4/5] bg-emerald-50 rounded-[2rem] overflow-hidden relative shadow-lg">
-            <div className="absolute inset-0 flex items-center justify-center text-emerald-200 flex-col gap-4">
-              <span className="text-sm border border-emerald-200 px-4 py-2 rounded-full">Replace with Warm Portrait or Office Photo</span>
-            </div>
+            <Image 
+              src="/hero-photo.jpg" 
+              alt="Sandhya Narayan" 
+              fill 
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover hover:scale-105 transition-transform duration-700"
+              priority
+            />
           </div>
         </div>
       </section>
@@ -65,11 +70,14 @@ export default function TherapistPortfolio() {
             
             {/* Left Column: Image & Quick Facts */}
             <div className="md:col-span-5 space-y-6 md:sticky md:top-32">
-              {/* Image Placeholder */}
               <div className="aspect-[4/5] bg-emerald-50 rounded-[2.5rem] overflow-hidden relative shadow-sm border border-emerald-100/50">
-                <div className="absolute inset-0 flex items-center justify-center text-emerald-300">
-                  <span className="text-sm border border-emerald-200 px-5 py-2.5 rounded-full bg-white/50 backdrop-blur-sm">Therapist Portrait</span>
-                </div>
+                <Image 
+                  src="/about-photo.jpg" 
+                  alt="Sandhya Narayan" 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  className="object-cover"
+                />
               </div>
               
               {/* Quick Facts Card */}
