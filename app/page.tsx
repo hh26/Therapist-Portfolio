@@ -2,20 +2,38 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Heart, Users, User, ArrowRight, Calendar, Phone, Mail, GraduationCap, Globe, Clock, Sparkles, Target, PieChart, HandHeart, Leaf, LifeBuoy, Book, Anchor, Moon, Download, MessageCircle, X, Send } from 'lucide-react';
+import { Heart, Users, User, ArrowRight, Calendar, Phone, Mail, GraduationCap, Globe, Clock, Sparkles, Target, PieChart, HandHeart, Leaf, LifeBuoy, Book, Anchor, Moon, Download, MessageCircle, X, Send, Menu } from 'lucide-react';
 
 export default function TherapistPortfolio() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatStatus, setChatStatus] = useState('idle');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-slate-800 font-sans selection:bg-emerald-200">
       
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="font-serif text-xl font-semibold text-emerald-800">
-            Sandhya Narayan
+          
+          {/* Mobile Menu Button + Logo */}
+          <div className="flex items-center gap-4">
+            <button 
+              className="md:hidden text-slate-600 hover:text-emerald-600 transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu size={24} />
+            </button>
+            <div className="flex flex-col">
+              <span className="font-serif text-xl font-semibold text-emerald-800">
+                Sandhya Narayan
+              </span>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-widest mt-0.5">
+                Counseling Psychologist
+              </span>
+            </div>
           </div>
+
+          {/* Desktop Links (Hidden on Mobile) */}
           <div className="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
             <a href="#about" className="hover:text-emerald-600 transition-colors">About</a>
             <a href="#services" className="hover:text-emerald-600 transition-colors">Services</a>
@@ -28,11 +46,44 @@ export default function TherapistPortfolio() {
         </div>
       </nav>
 
+      {/* Mobile Slide-Out Menu */}
+      <div 
+        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+
+      <div className={`fixed top-0 left-0 h-full w-64 bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 flex justify-between items-center border-b border-slate-100">
+          <span className="font-serif font-semibold text-emerald-800">Menu</span>
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="text-slate-400 hover:text-slate-800 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        <div className="flex flex-col p-6 space-y-6 text-slate-600 font-medium">
+          <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">About</a>
+          <a href="#services" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Services</a>
+          <a href="#process" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Process</a>
+          <a href="#resources" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Resources</a>
+          <hr className="border-slate-100" />
+          <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="text-emerald-600 font-semibold flex items-center gap-2">
+            Book Consultation <ArrowRight size={16} />
+          </a>
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-6 py-20 md:py-32 flex flex-col md:flex-row items-center gap-12">
+      <section className="max-w-6xl mx-auto px-6 pt-12 pb-20 md:py-32 flex flex-col-reverse md:flex-row items-center gap-12">
         <div className="flex-1 space-y-6">
-          <div className="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full">
-            Accepting New Clients
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+              Counseling Psychologist
+            </div>
+            <div className="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1.5 rounded-full">
+              Accepting New Clients
+            </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-serif text-slate-900 leading-tight">
             A Space to be Intentional, Relational, Quietly political, and <span className="text-emerald-700">Deeply Human</span>.
@@ -64,9 +115,9 @@ export default function TherapistPortfolio() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 bg-[#FAFAFA] border-y border-slate-100">
+      <section id="about" className="py-8 md:py-24 bg-[#FAFAFA] border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-12 gap-16 items-start">
+          <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
             
             {/* Left Column: Image & Quick Facts */}
             <div className="md:col-span-5 space-y-6 md:sticky md:top-32">
@@ -86,14 +137,14 @@ export default function TherapistPortfolio() {
                   <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-1">
                     <GraduationCap size={16} className="text-emerald-600"/> Qualifications
                   </h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">M.Sc. in Counselling Psychology</p>
+                  <p className="text-sm text-slate-600 leading-relaxed">M.Sc. in Counseling Psychology</p>
                 </div>
                 <div className="h-px w-full bg-slate-50"></div>
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-1">
                     <Clock size={16} className="text-emerald-600"/> Experience
                   </h4>
-                  <p className="text-sm text-slate-600">1+ Years in Counselling Practice</p>
+                  <p className="text-sm text-slate-600">1+ Years in Counseling Practice</p>
                 </div>
                 <div className="h-px w-full bg-slate-50"></div>
                 <div>
@@ -170,7 +221,7 @@ export default function TherapistPortfolio() {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="bg-white py-24 border-y border-slate-100">
+      <section id="services" className="bg-white py-8 md:py-24 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-serif text-slate-900 mb-4">How I Can Help</h2>
@@ -206,7 +257,7 @@ export default function TherapistPortfolio() {
       </section>
 
       {/* The Process Section */}
-      <section id="process" className="py-24 max-w-6xl mx-auto px-6">
+      <section id="process" className="py-8 md:py-24 max-w-6xl mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-serif text-slate-900 mb-12 text-center">Your Journey Starts Here</h2>
         <div className="grid md:grid-cols-3 gap-12 relative">
           <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-0.5 bg-emerald-100 z-0"></div>
@@ -232,7 +283,7 @@ export default function TherapistPortfolio() {
       </section>
 
       {/* Resources Section */}
-      <section id="resources" className="py-24 bg-white border-t border-slate-100">
+      <section id="resources" className="py-16 md:py-24 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-serif text-slate-900 mb-4">Client Resources</h2>
@@ -333,8 +384,8 @@ export default function TherapistPortfolio() {
       </section>
 
       {/* Contact & Booking */}
-      <section id="contact" className="bg-slate-900 text-white py-24">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16">
+      <section id="contact" className="bg-slate-900 text-white py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 md:gap-16">
           <div>
             <h2 className="text-3xl md:text-4xl font-serif mb-6">Let's Connect.</h2>
             <p className="text-slate-400 mb-8 max-w-md">Taking the first step is often the hardest. Reach out using the form, or book a consultation directly.</p>
