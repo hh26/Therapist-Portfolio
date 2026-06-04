@@ -156,55 +156,29 @@ export default function Home() {
 
       {/* 3. CONTACT SECTION */}
       <section id="contact" className="bg-slate-900 text-white py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 md:gap-16">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-serif mb-6">Let's Connect.</h2>
-            <p className="text-slate-400 mb-8 max-w-md">Taking the first step is often the hardest. Reach out using the form, or book a consultation directly.</p>
-            
-            <div className="space-y-6">
-              <a href="mailto:sandhya.narayan.psy@gmail.com" className="flex items-center gap-4 text-slate-300 hover:text-white transition-colors w-fit">
-                <Mail className="text-emerald-400" /> sandhya.narayan.psy@gmail.com
-              </a>
-              <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-slate-300 hover:text-white transition-colors w-fit">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="24" 
-                  height="24" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  className="text-emerald-400"
-                >
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                </svg>
-                @sandhya_narayan_psy
-              </a>
-            </div>
-
-            {/* Simple Form UI */}
-            <form className="mt-12 space-y-4">
-              <input type="text" placeholder="Your Name" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500" />
-              <input type="email" placeholder="Email Address" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500" />
-              <textarea placeholder="What brings you here today?" rows={4} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"></textarea>
-              <button className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-emerald-500 transition-all w-full">
-                Send Message
-              </button>
-            </form>
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-serif mb-6">Let's Connect.</h2>
+          <p className="text-slate-400 mb-10 max-w-lg mx-auto">Taking the first step is often the hardest. Reach out directly or start by filling out the intake form to book a consultation.</p>
+          
+          {/* Email & Instagram Links */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
+            <a href="mailto:sandhya.narayan.psy@gmail.com" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors bg-slate-800 px-6 py-3 rounded-full border border-slate-700 w-full sm:w-auto justify-center">
+              <Mail className="text-emerald-400" size={20} /> sandhya.narayan.psy@gmail.com
+            </a>
+            <a href="https://instagram.com/sandhya.narayan.psy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors bg-slate-800 px-6 py-3 rounded-full border border-slate-700 w-full sm:w-auto justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+              </svg>
+              @sandhya.narayan.psy
+            </a>
           </div>
 
-          <div className="bg-slate-800 rounded-3xl p-8 flex flex-col items-center justify-center text-center border border-slate-700">
-             <Calendar size={48} className="text-slate-600 mb-4" />
-             <h3 className="text-xl font-medium mb-2">Secure Online Booking</h3>
-             <p className="text-slate-400 text-sm mb-8">Replace this box with your Calendly or Jane.app embed code for seamless scheduling.</p>
-             <button className="bg-slate-700 text-slate-300 px-6 py-2 rounded-lg text-sm border border-slate-600">
-               [ Embed Booking Widget Here ]
-             </button>
-          </div>
+          {/* Intake Form Button */}
+          <Link href="/intake" className="inline-flex items-center gap-3 bg-emerald-600 text-white px-8 py-4 rounded-full font-medium hover:bg-emerald-500 transition-all text-lg shadow-lg hover:shadow-emerald-900/50">
+            Book Consultation / Intake Form <ArrowRight size={20} />
+          </Link>
         </div>
       </section>
     </>
