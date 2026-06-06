@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Lock, AlertCircle, Trash2 } from 'lucide-react';
+import { Send, Lock, AlertCircle, Trash2, CheckCircle } from 'lucide-react';
 
 export default function IntakePage() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -9,14 +9,17 @@ export default function IntakePage() {
   // State for conditional rendering
   const [commMode, setCommMode] = useState('');
   const [genderSelection, setGenderSelection] = useState('');
+  const [sourceSelection, setSourceSelection] = useState(''); // Added to track the new 'Other' field
   
-  // State for our custom validation
+  // State for submission & validation
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [missingFields, setMissingFields] = useState<string[]>([
     "Name", "Age", "Gender", "Email", "Communication Mode", "How you heard about me", "Concerns", "Virtual Comfort"
   ]);
 
-  // Our custom, bulletproof validation logic
+  // Our custom validation, mapped to your specific Google Form IDs
   const validateForm = () => {
     if (!formRef.current) return;
     
@@ -24,72 +27,101 @@ export default function IntakePage() {
     const missing: string[] = [];
 
     // 1. Name & Age
-    if (!data.get('name')?.toString().trim()) missing.push("Name");
-    if (!data.get('age')?.toString().trim()) missing.push("Age");
+    if (!data.get('entry.85339926')?.toString().trim()) missing.push("Name");
+    if (!data.get('entry.741604512')?.toString().trim()) missing.push("Age");
 
     // 2. Gender
-    const gender = data.get('gender');
+    const gender = data.get('entry.150776536');
     if (!gender) {
       missing.push("Gender");
-    } else if (gender === 'Other' && !data.get('gender_other')?.toString().trim()) {
+    } else if (gender === '__other_option__' && !data.get('entry.150776536.other_option_response')?.toString().trim()) {
       missing.push("Specify Gender");
     }
 
     // 3. Email
-    const email = data.get('email')?.toString().trim() || "";
+    const email = data.get('entry.1070126420')?.toString().trim() || "";
     if (!email || !email.includes('@')) missing.push("Valid Email");
 
     // 4. Communication Mode
-    const comm = data.get('communication_mode');
+    const comm = data.get('entry.1467909129');
     if (!comm) {
       missing.push("Communication Mode");
-    } else if (comm === 'WhatsApp' && !data.get('whatsapp_number')?.toString().trim()) {
+    } else if (comm === 'WhatsApp' && !data.get('entry.46654007')?.toString().trim()) {
       missing.push("WhatsApp Number");
     }
 
-    // 5. Source (How did you hear about me)
-    if (!data.get('source')) missing.push("How you heard about me");
+    // 5. Source (How did you hear about me) - UPDATED with "Other" validation
+    const source = data.get('entry.1378130429');
+    if (!source) {
+      missing.push("How you heard about me");
+    } else if (source === '__other_option__' && !data.get('entry.1378130429.other_option_response')?.toString().trim()) {
+      missing.push("Specify how you heard about me");
+    }
 
     // 6. Concerns
-    const hasConcerns = data.getAll('concerns[]').length > 0;
-    const hasOtherConcern = !!data.get('concerns_other')?.toString().trim();
-    if (!hasConcerns && !hasOtherConcern) {
+    const concerns = data.getAll('entry.782438917');
+    const checkedOptions = concerns.filter(c => c !== '__other_option__');
+    const isOtherCheckedAndFilled = concerns.includes('__other_option__') && !!data.get('entry.782438917.other_option_response')?.toString().trim();
+    
+    if (checkedOptions.length === 0 && !isOtherCheckedAndFilled) {
       missing.push("Concerns");
     }
 
     // 7. Virtual Comfort
-    if (!data.get('virtual_comfort')) missing.push("Virtual Comfort");
+    if (!data.get('entry.1897267166')) missing.push("Virtual Comfort");
 
     // Update states
     setMissingFields(missing);
     setIsFormValid(missing.length === 0);
   };
 
-  // Run validation on every single keystroke or click
   const handleFormChange = (e: React.FormEvent<HTMLFormElement>) => {
     const target = e.target as HTMLInputElement;
-    if (target.name === 'gender') setGenderSelection(target.value);
-    if (target.name === 'communication_mode') setCommMode(target.value);
+    if (target.name === 'entry.150776536') setGenderSelection(target.value);
+    if (target.name === 'entry.1467909129') setCommMode(target.value);
+    if (target.name === 'entry.1378130429') setSourceSelection(target.value); // Track source
     
     setTimeout(validateForm, 0);
   };
 
-  // Completely wipe the form and reset the validation state
   const handleClearForm = () => {
     if (formRef.current) {
       formRef.current.reset();
       setCommMode('');
       setGenderSelection('');
+      setSourceSelection(''); // Clear source
       setTimeout(validateForm, 0);
     }
   };
+
+  // If the form was successfully submitted to Google, show a thank you message!
+  if (showSuccess) {
+    return (
+      <section className="bg-slate-100 py-16 md:py-24 min-h-screen flex items-center justify-center font-sans">
+        <div className="max-w-md mx-auto px-6 w-full text-center">
+          <div className="bg-white p-12 rounded-3xl shadow-xl border border-slate-200 flex flex-col items-center">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+              <CheckCircle size={32} />
+            </div>
+            <h2 className="text-2xl font-serif text-slate-900 mb-4">Thank you for sharing.</h2>
+            <p className="text-slate-600 mb-8 leading-relaxed">
+              Your intake form has been securely submitted. I will review your information and be in touch within 24-48 hours.
+            </p>
+            <button onClick={() => window.location.href = '/'} className="bg-slate-900 text-white px-8 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all">
+              Return Home
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-slate-100 py-16 md:py-24 min-h-screen flex items-center justify-center font-sans">
       <div className="max-w-3xl mx-auto px-6 w-full">
         
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-serif text-slate-900 mb-6 tracking-tight">Getting to Know You: Therapy Intake Form</h1>
+          <h1 className="text-3xl md:text-4xl font-serif text-slate-900 mb-6 tracking-tight">Intake Form</h1>
           
           <div className="text-slate-500 font-medium max-w-xl mx-auto space-y-4 leading-relaxed text-sm md:text-base">
             <p>
@@ -113,23 +145,37 @@ export default function IntakePage() {
             <span>Secure & strictly confidential</span>
           </div>
 
+          <iframe 
+            name="hidden_iframe" 
+            id="hidden_iframe" 
+            style={{ display: 'none' }} 
+            onLoad={() => {
+              if (isSubmitted) {
+                setShowSuccess(true);
+                setIsSubmitted(false);
+              }
+            }}
+          ></iframe>
+
           <form 
             ref={formRef}
             onChange={handleFormChange}
             onKeyUp={handleFormChange}
-            action="https://formspree.io/f/YOUR_UNIQUE_ID_HERE" 
+            onSubmit={() => setIsSubmitted(true)}
+            action="https://docs.google.com/forms/d/e/1FAIpQLSeu3EzGjQmRPUoCxUNfvAk0e18MJ-QrQD2KuLExHID5ddtozw/formResponse" 
             method="POST" 
+            target="hidden_iframe"
             className="space-y-10"
           >
             
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Name / Initials <span className="text-emerald-700">*</span></label>
-                <input type="text" name="name" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all" />
+                <input type="text" name="entry.85339926" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Age <span className="text-emerald-700">*</span></label>
-                <input type="number" name="age" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all" />
+                <input type="number" name="entry.741604512" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all" />
               </div>
             </div>
 
@@ -138,32 +184,32 @@ export default function IntakePage() {
               <div className="space-y-3">
                 {['Male', 'Female', 'Non Binary'].map((option) => (
                   <label key={option} className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group w-fit">
-                    <input type="radio" name="gender" value={option} className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800 transition-colors" /> 
+                    <input type="radio" name="entry.150776536" value={option} className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800 transition-colors" /> 
                     <span className="group-hover:text-emerald-900 transition-colors">{option}</span>
                   </label>
                 ))}
                 <div className="flex items-center gap-3 text-sm text-slate-700">
-                  <input type="radio" name="gender" value="Other" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
+                  <input type="radio" name="entry.150776536" value="__other_option__" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
                   <span>Other:</span>
-                  <input type="text" name="gender_other" className="bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 flex-1 max-w-xs transition-all" />
+                  <input type="text" name="entry.150776536.other_option_response" className="bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 flex-1 max-w-xs transition-all" />
                 </div>
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Mail ID <span className="text-emerald-700">*</span></label>
-              <input type="email" name="email" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all" />
+              <input type="email" name="entry.1070126420" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all" />
             </div>
 
             <div className="bg-slate-50 p-6 rounded-xl border border-slate-200/60">
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Preferred mode of communication <span className="text-emerald-700">*</span></label>
               <div className="space-y-3 mb-6">
                 <label className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group w-fit">
-                  <input type="radio" name="communication_mode" value="Email" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
+                  <input type="radio" name="entry.1467909129" value="Email" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
                   <span className="group-hover:text-emerald-900 transition-colors">Email</span>
                 </label>
                 <label className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group w-fit">
-                  <input type="radio" name="communication_mode" value="WhatsApp" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
+                  <input type="radio" name="entry.1467909129" value="WhatsApp" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
                   <span className="group-hover:text-emerald-900 transition-colors">WhatsApp</span>
                 </label>
               </div>
@@ -174,21 +220,27 @@ export default function IntakePage() {
                 </label>
                 <input 
                   type="tel" 
-                  name="whatsapp_number" 
+                  name="entry.46654007" 
                   className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all max-w-md shadow-sm" 
                 />
               </div>
             </div>
 
+            {/* UPDATED: Added "Other" text input for the Source question */}
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">How did you hear about me? <span className="text-emerald-700">*</span></label>
               <div className="space-y-3">
                 {['Instagram', 'Website', 'Word of Mouth'].map((option) => (
                   <label key={option} className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group w-fit">
-                    <input type="radio" name="source" value={option} className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800 transition-colors" /> 
+                    <input type="radio" name="entry.1378130429" value={option} className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800 transition-colors" /> 
                     <span className="group-hover:text-emerald-900 transition-colors">{option}</span>
                   </label>
                 ))}
+                <div className="flex items-center gap-3 text-sm text-slate-700">
+                  <input type="radio" name="entry.1378130429" value="__other_option__" className="w-4 h-4 text-emerald-800 border-slate-300 focus:ring-emerald-800" /> 
+                  <span>Other:</span>
+                  <input type="text" name="entry.1378130429.other_option_response" className="bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 flex-1 max-w-xs transition-all" />
+                </div>
               </div>
             </div>
 
@@ -205,13 +257,14 @@ export default function IntakePage() {
                   "Self - Exploration & Personal Growth"
                 ].map((concern) => (
                   <label key={concern} className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group w-fit">
-                    <input type="checkbox" name="concerns[]" value={concern} className="w-4 h-4 text-emerald-800 border-slate-300 rounded focus:ring-emerald-800" /> 
+                    <input type="checkbox" name="entry.782438917" value={concern} className="w-4 h-4 text-emerald-800 border-slate-300 rounded focus:ring-emerald-800" /> 
                     <span className="group-hover:text-emerald-900 transition-colors">{concern}</span>
                   </label>
                 ))}
                 <div className="flex items-center gap-3 text-sm text-slate-700 pt-2">
+                  <input type="checkbox" name="entry.782438917" value="__other_option__" className="w-4 h-4 text-emerald-800 border-slate-300 rounded focus:ring-emerald-800" /> 
                   <span>Other:</span>
-                  <input type="text" name="concerns_other" className="bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 flex-1 max-w-sm transition-all" />
+                  <input type="text" name="entry.782438917.other_option_response" className="bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 flex-1 max-w-sm transition-all" />
                 </div>
               </div>
             </div>
@@ -219,7 +272,7 @@ export default function IntakePage() {
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Additional concerns</label>
               <p className="text-sm text-slate-400 mb-3 font-light">Kindly use this space to mention if you would like to work with a concern that is not listed above.</p>
-              <textarea name="unlisted_concerns" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all resize-none"></textarea>
+              <textarea name="entry.1273350129" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all resize-none"></textarea>
             </div>
 
             <div>
@@ -230,7 +283,7 @@ export default function IntakePage() {
                   {[1, 2, 3, 4, 5].map((num) => (
                     <label key={num} className="flex flex-col items-center gap-3 cursor-pointer group">
                       <span className="text-sm font-semibold text-slate-400 group-hover:text-emerald-800 transition-colors">{num}</span>
-                      <input type="radio" name="virtual_comfort" value={num} className="w-5 h-5 text-emerald-800 border-slate-300 focus:ring-emerald-800" />
+                      <input type="radio" name="entry.1897267166" value={num} className="w-5 h-5 text-emerald-800 border-slate-300 focus:ring-emerald-800" />
                     </label>
                   ))}
                 </div>
@@ -241,18 +294,17 @@ export default function IntakePage() {
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Expectations</label>
               <p className="text-sm text-slate-400 mb-3 font-light">What do you expect from the sessions?</p>
-              <textarea name="expectations" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all resize-none"></textarea>
+              <textarea name="entry.1720058291" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all resize-none"></textarea>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Questions or Queries</label>
               <p className="text-sm text-slate-400 mb-3 font-light">Anything you would like me to know before we begin?</p>
-              <textarea name="questions_queries" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all resize-none"></textarea>
+              <textarea name="entry.2074303993" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:bg-white focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 transition-all resize-none"></textarea>
             </div>
 
             <div className="pt-8 border-t border-slate-100">
               
-              {/* Dynamic Error Tracker */}
               {!isFormValid && (
                 <div className="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-100 flex items-start gap-3">
                   <AlertCircle size={20} className="text-orange-500 shrink-0 mt-0.5" />
