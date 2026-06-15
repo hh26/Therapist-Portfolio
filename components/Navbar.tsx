@@ -24,6 +24,7 @@ export default function Navbar() {
             <Link href="/services" className="hover:text-emerald-600 transition-colors">Services</Link>
             <Link href="/process" className="hover:text-emerald-600 transition-colors">Process</Link>
             <Link href="/resources" className="hover:text-emerald-600 transition-colors">Resources</Link>
+            <Link href="/blog" className="hover:text-emerald-600 transition-colors">Blog</Link>
           </div>
           <Link href="/intake" className="hidden md:inline-flex bg-emerald-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-emerald-700 transition-all shadow-sm">
             Book Consultation
@@ -45,6 +46,7 @@ export default function Navbar() {
           <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Services</Link>        
           <Link href="/process" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Process</Link>
           <Link href="/resources" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Resources</Link>
+          <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-emerald-600">Blog</Link>
           <hr className="border-slate-100" />
           <Link href="/intake" onClick={() => setIsMobileMenuOpen(false)} className="text-emerald-600 font-semibold flex items-center gap-2">
             Book Consultation <ArrowRight size={16} />

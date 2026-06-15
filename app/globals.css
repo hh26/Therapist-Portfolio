@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@plugin "@tailwindcss/typography";
 
 /* Add this to make scrolling smooth when clicking navbar links */
 html {
